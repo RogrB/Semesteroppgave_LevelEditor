@@ -7,6 +7,12 @@ import javafx.scene.paint.Color;
 import javafx.scene.shape.Rectangle;
 import javafx.scene.text.Text;
 
+/**
+ * <h1>MenuButton class</h1>
+ * Copied from our main project.
+ * Refer to the MenuButton class in the main project
+ * for proper documentation
+ */
 public class MenuButton extends StackPane{
     private Text text;
     private Rectangle bg;

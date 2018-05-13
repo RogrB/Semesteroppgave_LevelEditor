@@ -27,31 +27,94 @@ import javafx.scene.input.DragEvent;
 import javafx.scene.input.Dragboard;
 import javafx.scene.input.TransferMode;
 
-
+/**
+ * <h1>LevelEditorView class</h1>
+ * This class handles FrontEnd functionality of the LevelEditor
+ * 
+ * @author Roger Birkenes Solli
+ */
 public class LevelEditorView {
     
+    /**
+     * Singleton object
+     */      
     private static LevelEditorView inst = new LevelEditorView();
+    
+    /**
+     * Method to access singleton class.
+     * @return Returns a reference to the singleton object.
+     */              
     public static LevelEditorView getInstance(){return inst; }      
     
+    /**
+     * Root pane
+     */      
     public Pane root;
+    
+    /**
+     * BackGround image source path
+     */      
     private static final String BG_IMG = "assets/image/background.jpg";
+    
+    /**
+     * {@code Sprite} object
+     */      
     Sprite sprite;
+    
+    /**
+     * Number of columns - Amount of enemy waves to be generated
+     */      
     private int columnCounter = 10;
+    
+    /**
+     * Canvas - Renders the grid of {@code EnemyItem} objects
+     */      
     final Canvas canvas = new Canvas(1190, 425);
+    
+    /**
+     * GraphicsContext for the Canvas
+     */      
     final GraphicsContext gc = canvas.getGraphicsContext2D();
+    
+    /**
+     * Pane container for the canvas
+     */      
     final Pane canvasPane = new Pane();
+    
+    /**
+     * {@code LevelEditorLogic} object
+     * @see LevelEditorLogic
+     */      
     LevelEditorLogic logic = new LevelEditorLogic(columnCounter);  
+    
+    /**
+     * Slider for setting number of columns
+     */      
     private Slider enemyWavesSlider;
+    
+    /**
+     * FlowPane for draggable EnmyItem ImgViews
+     */      
     private FlowPane enemyPane;    
     
+    /**
+     * ObservableList containing the various Movement Patterns for enemies in the game
+     */      
     ObservableList<String> movements = FXCollections.observableArrayList("",
             "LEFT", "LEFT_PULSATING", "SIN", "SIN_REVERSED",
             "COS", "COS_REVERSED", "TRI", "TRI_REVERSED",
             "MADNESS_01", "MADNESS_02", "MADNESS_03",
             "BOSS_LINE", "BOSS_EIGHT", "BOSS_OVAL");
     
+    /**
+     * ChoiceBox to select the Enemy Movement Patterns
+     */      
     private ChoiceBox<String> enemyMovement = new ChoiceBox<>(movements);
     
+    /**
+     * Method to initiate the Scene
+     * @return gets the Root pane to pass to {@code Main}
+     */      
     public Parent initScene(){
         root = new Pane();
         Text selectEnemiesText = new Text("Drag and Drop enemies to grid");
@@ -156,6 +219,9 @@ public class LevelEditorView {
 
     }    
     
+    /**
+     * @return gets the FlowPane that contains the draggable ImgViews
+     */      
     public FlowPane getEnemiesPane() {
         enemyPane = new FlowPane(10, 10);
         enemyPane.setTranslateX(10);
@@ -168,7 +234,10 @@ public class LevelEditorView {
         return enemyPane;
     }
         
-    
+    /**
+     * @return gets the BackgroundImage used in the scene
+     * @param BG_IMG inputs the source path
+     */      
     public Background getBackGroundImage(String BG_IMG){
         BackgroundImage bg = new BackgroundImage(
                 new Image(BG_IMG),
@@ -187,38 +256,43 @@ public class LevelEditorView {
         return new Background(bg);
     }    
     
+    /**
+     * @param columns sets the number of columns - derived from the slider
+     */      
     public void setColumns(int columns) {
         this.columnCounter = columns;
         logic.setEnemyColumns(gc, columns);
     }
     
+    /**
+     * @return gets the current number of columns
+     */      
     public int getColumns() {
         return this.columnCounter;
     }
     
+    /**
+     * @return gets the GraphicsContext to draw on
+     */      
     public GraphicsContext getGC() {
         return this.gc;
     }
     
+    /**
+     * Method to set the selected MovementPattern from the ChoiceBox
+     * to the currently selected {@code EnemyItem} on the grid
+     */      
     public void setMovementPattern() {
         String pattern = enemyMovement.getValue();
         if (logic.getSelectedX() != -1 && logic.getSelectedY() != -1) {
             //System.out.println("Selected movementpattern " + pattern  + " for enemy " + logic.getSelectedX() + " , " + logic.getSelectedY());
             logic.setMovementPattern(logic.getSelectedX(), logic.getSelectedY(), pattern);
         }
-        else {
-            //System.out.println("Selected movementpattern " + pattern);
-        }
     }
     
-    private void populateEnemies() {
-        List<EnemyItem> enems = getEnemyList();
-        enems.stream().map((e) -> {
-            enemyPane.getChildren().add(e.getImgView());
-            return e;
-        }).forEach((e) -> { });
-    }  
-    
+    /**
+     * Adds all the available enemies in the game to a List
+     */      
     private List<EnemyItem> getEnemyList() {
         ArrayList<EnemyItem> enemyList = new ArrayList<>();
         enemyList.add(new EnemyItem(false, Sprite.BLUE1));
@@ -237,12 +311,30 @@ public class LevelEditorView {
         enemyList.add(new EnemyItem(false, Sprite.BOSS02));
         enemyList.add(new EnemyItem(false, Sprite.METEOR));
         return enemyList;    
-    }
+    }    
     
+    /**
+     * Adds the draggable EnemyItems to the FlowPane
+     */      
+    private void populateEnemies() {
+        List<EnemyItem> enems = getEnemyList();
+        enems.stream().map((e) -> {
+            enemyPane.getChildren().add(e.getImgView());
+            return e;
+        }).forEach((e) -> { });
+    }  
+    
+    /**
+     * @return gets the ChoiceBox for EnemyMovements
+     */     
     public ChoiceBox<String> getChoiceBox() {
         return enemyMovement;
     }
     
+    /**
+     * Creates an Alert PopUp to notify the user
+     * that the LevelData has been copied to the clipboard
+     */     
     public void printData() {
         logic.setDataToClipBoard();
         Alert output = new Alert(Alert.AlertType.INFORMATION);
@@ -253,6 +345,9 @@ public class LevelEditorView {
         output.showAndWait();        
     }
     
+    /**
+     * Creates a Help PopUp
+     */     
     public void getHelp() {
         Alert help = new Alert(Alert.AlertType.INFORMATION);
         help.setTitle("LevelEditor Help");

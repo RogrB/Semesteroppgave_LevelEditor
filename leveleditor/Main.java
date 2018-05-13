@@ -2,21 +2,26 @@ package leveleditor;
 
 import javafx.application.Application;
 import javafx.application.Platform;
-import javafx.event.ActionEvent;
-import javafx.event.EventHandler;
 import javafx.scene.Scene;
-import javafx.scene.control.Button;
-import javafx.scene.layout.StackPane;
 import javafx.stage.Stage;
 
+/**
+ * <h1>The Main class</h1>
+ * Starting point for the JavaFX application
+ */
 public class Main extends Application {
     
+    /**
+    * Creates an instance of the {@code LevelEditorView} class
+    * to grab the root from its {@code initScene} method
+    */
     public static LevelEditorView editor = new LevelEditorView();
     
+    /**
+    * Starting method for the JavaFX application
+    */    
     @Override
     public void start(Stage primaryStage) {
-        
-        //StackPane root = new StackPane();
         
         Scene scene = new Scene(editor.initScene());
         
@@ -34,6 +39,10 @@ public class Main extends Application {
         
     }
 
+    /**
+    * Entrypoint for the application
+    * @param args args
+    */    
     public static void main(String[] args) {
         launch(args);
     }

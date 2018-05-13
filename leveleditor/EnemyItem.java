@@ -7,16 +7,48 @@ import javafx.scene.input.Dragboard;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.input.TransferMode;
 
+/**
+ * <h1>EnemyItem class</h1>
+ * This class handles the individual enemy items
+ * that populates the grid.
+ * 
+ * @author Roger Birkenes Solli
+ */
 public class EnemyItem {
     
-    private int x;
-    private int y;
+    /**
+     * Active state - if the EnemyItem is "alive" or "dead"
+     */        
     private boolean active;
+    
+    /**
+     * Sprite
+     */        
     private Sprite sprite;
+    
+    /**
+     * Image
+     */        
     private Image image;
+    
+    /**
+     * ImageView - needed to make the EnemyItem draggable
+     */        
     private ImageView enemyImage;
+    
+    /**
+     * MovementPattern 
+     */        
     private String movementPattern;
     
+    /**
+     * <b>Constructor</b> Sets the sprite and whether or not
+     * the EnemyItem is "alive".
+     * Then creates an ImageView and sets Mouse Drag event for the object
+     * to make it draggable.
+     * @param active sets the EnemyItem active or dead
+     * @param sprite sets the Sprite of the EnemyItem
+     */       
     public EnemyItem(boolean active, Sprite sprite) {
         this.active = active;
         this.sprite = sprite;
@@ -35,51 +67,60 @@ public class EnemyItem {
         });        
     }
     
+    /**
+     * <b>Constructor</b> That takes in an active input.
+     * Primarily used to set EnemyItems inactive
+     * @param active sets active or inactive.
+     */       
     public EnemyItem(boolean active) {
         this.active = active;
     }
     
+    /**
+     * @return gets current active state
+     */       
     public boolean getActive() {
         return this.active;
     }
     
+    /**
+     * @param active sets active state
+     */        
     public void setActive(boolean active) {
         this.active = active;
     }
     
-    /*
-    public int getX() {
-        return this.x;
-    }
-    
-    public void setX(int x) {
-        this.x = x;
-    }
-    
-    public int getY() {
-        return this.y;
-    }
-    
-    public void setY(int y) {
-        this.y = y;
-    }*/
-    
+    /**
+     * @return gets the Sprite for {@code this}
+     */        
     public Sprite getSprite() {
         return this.sprite;
     }
     
+    /**
+     * @return gets the ImageView for {@code this}
+     */        
     public ImageView getImgView() {
         return this.enemyImage;
     }
     
+    /**
+     * @return gets the MovementPattern of {@code this}
+     */        
     public String getMovementPattern() {
         return this.movementPattern;
     }
     
+    /**
+     * @param pattern sets MovementPattern
+     */        
     public void setMovementPattern(String pattern) {
         this.movementPattern = pattern;
     }
     
+    /**
+     * @return gets {@code this} type of enemy
+     */        
     public int getType() {
         int type = 0;
         if (sprite == sprite.METEOR) {

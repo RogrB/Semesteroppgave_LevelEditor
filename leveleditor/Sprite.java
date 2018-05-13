@@ -2,6 +2,12 @@ package leveleditor;
 
 import javafx.scene.image.Image;
 
+/**
+ * <h1>Sprite Enum</h1>
+ * Copied from our main project.
+ * Refer to the Sprite enum in the main project
+ * for proper documentation
+ */
 public enum Sprite {
 
     // Enemies

@@ -1,6 +1,5 @@
 package leveleditor;
 
-import javafx.scene.input.InputEvent;
 import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.paint.Color;
 import javafx.scene.image.Image;
@@ -8,25 +7,80 @@ import javafx.scene.input.Clipboard;
 import javafx.scene.input.ClipboardContent;
 import javafx.scene.input.MouseEvent;
 
+/**
+ * <h1>Handles the BackEnd functionality of the LevelEditor</h1>
+ * 
+ * @author Roger Birkenes Solli
+ */
 public class LevelEditorLogic {
     
+    /**
+     * Array of {@code EnemyItem} objects to populate the grid
+     * @see EnemyItem
+     */          
     private EnemyItem enemies[][];
+    
+    /**
+     * Scalable size of the individual cells on the grid
+     */          
     private int cellSize = 60;
+    
+    /**
+     * Number of columns - Represents the amount of enemy waves in the level
+     */          
     private int columns = 10;
+    
+    /**
+     * Old X value for grid rectangle - to know where to clear when re-drawing the grid
+     */          
     private double oldRectX = -1;
+    
+    /**
+     * Old Y value for grid rectangle - to know where to clear when re-drawing the grid
+     */       
     private double oldRectY = -1;
+    
+    /**
+     * Currently selected grid cell X value
+     */       
     private int selectedX = -1; 
+    
+    /**
+     * Currently selected grid cell Y value
+     */      
     private int selectedY = -1;
+    
+    /**
+     * Previous selected grid cell X value
+     * Needed to re-draw grid cell when selecting a new one
+     */      
     private int oldSelectedX = -1;
+    
+    /**
+     * Previous selected grid cell Y value
+     * Needed to re-draw grid cell when selecting a new one
+     */      
     private int oldSelectedY = -1;
     
+    
+    /**
+     * <b>Constructor</b>
+     * @param columns sets the initial column count
+     * and creates a new array of {@code EnemyItem} objects
+     * based on the column count
+     */          
     public LevelEditorLogic(int columns) {
         enemies = new EnemyItem[columns][7];
         this.columns = columns;
     }
     
+    /**
+     * @return gets the current state of the {@code EnemyItem} -
+     * to decide if the Item is to be rendered.
+     * @param x X value of the {@code EnemyItem} array
+     * @param y Y value of the {@code EnemyItem} array
+     */       
     public boolean checkEnemyState(int x, int y) {
-        // Sjekker om enemy i angitt posisjon i array er aktiv og skal rendres
         for (int i = 0; i < enemies.length; i++) {
             for (int j = 0; j < 7; j++) {
                 if (i == x && y == j) {
@@ -37,8 +91,13 @@ public class LevelEditorLogic {
         return false;
     }
     
+    /**
+     * Method that renders the grid and its items to the canvas.
+     * Draws the {@code EnemyItem} sprite to the cell if there is any active Items.
+     * Draws blank cells where there are no active {@code EnemyItem}
+     * @param gc GraphicsContext to draw on.
+     */       
     public void drawGrid(GraphicsContext gc) {
-        // Tegner grid til canvas
         gc.setFill(Color.WHITE);
         gc.clearRect(0, 0, 1190, 425);
         adjustCellSize();
@@ -57,14 +116,23 @@ public class LevelEditorLogic {
         }
     }     
     
+    /**
+     * Method to set the current number of grid columns
+     * @param gc Passes the GraphicsContext
+     * @param columns sets the current number of grid columns
+     */       
     public void setEnemyColumns(GraphicsContext gc, int columns) {
         this.columns = columns;
         enemies = new EnemyItem[columns][7];
         resetArray(gc);
     }
     
+    /**
+     * Clears the {@code EnemyItem} array
+     * and re-draws the grid
+     * @param gc Passes the GraphicsContext to draw
+     */       
     public void resetArray(GraphicsContext gc) {
-        // Clearer enemyarray
         for (int i = 0; i < enemies.length; i++) {
             for (int j = 0; j < 7; j++) {
                 enemies[i][j] = new EnemyItem(false);
@@ -73,12 +141,22 @@ public class LevelEditorLogic {
         drawGrid(gc);
     }
     
+    /**
+     * @return compares an input with two numbers to see if the value is in between
+     * @param input the input value to be compared - Used to adjust the CellSize of the Grid
+     * @param low the lower number
+     * @param high the higher number
+     */       
     public boolean isBetween(int input, int low, int high) {
         return low <= input && input <= high;
     }
     
+    /**
+     * Adjust the CellSize of the grid to be drawn on the canvas.
+     * Higher number of columns makes the CellSize smaller so the grid
+     * can still fit on the screen.
+     */       
     public void adjustCellSize() {
-        // Justerer cellsize ettersom kolonneantallet blir høyere
         if (isBetween(columns, 19,21)) {
             cellSize = 54;
         }
@@ -102,8 +180,13 @@ public class LevelEditorLogic {
         }   
     }
     
+    /**
+     * Method that handles click event when the user clicks on the grid and
+     * selects the cell that was clicked
+     * @param e the Mouse Event
+     * @param gc Passes the GraphicsContext
+     */       
     public void clicked(MouseEvent e, GraphicsContext gc) {  
-        // Onclick Event - for å kunne trykke på individuelle celler
         double x = e.getX();
         double y = e.getY();
         double rectX;
@@ -128,8 +211,11 @@ public class LevelEditorLogic {
         }
     }
     
+    /**
+     * @return gets the X value of a Cell on the grid - used for dropping {@code EnemyItem} on the grid
+     * @param mouseX passes the X value of the mouse when the method is called
+     */       
     public int getCellX(double mouseX) {
-        // Finner X celle fra drop
         int x = 0;
         double rectX;
         for (int i = 0; i < 1190; i++) {
@@ -143,8 +229,11 @@ public class LevelEditorLogic {
         return x;
     }
     
+    /**
+     * @return gets the Y value of a Cell on the grid - used for dropping {@code EnemyItem} on the grid
+     * @param mouseY passes the Y value of the mouse when the method is called
+     */       
     public int getCellY(double mouseY) {
-        // Finner Y celle fra drop
         int y = 0;
         double rectY;
         for (int i = 0; i < 1190; i++) {
@@ -158,8 +247,14 @@ public class LevelEditorLogic {
         return y;
     }    
     
+    /**
+     * Method that highlights a cell that has been clicked on the grid,
+     * and re-draws the previously selected cell.
+     * @param gc Passes GraphicsContext to draw on.
+     * @param x The cells X value
+     * @param y The cells Y value
+     */
     public void selectCell(GraphicsContext gc, double x, double y) {
-        // "markerer" en celle
         if (oldRectX != -1 && oldRectY != -1) {
             gc.clearRect(oldRectX+1, oldRectY+1, cellSize-2, cellSize-2);
             gc.setFill(Color.BLACK);
@@ -182,22 +277,22 @@ public class LevelEditorLogic {
         }
     }
     
-    /*
-    public void adjustMovementLabel() {
-        if(enemies[selectedX][selectedY].getActive()) {
-            LevelEditorView.getInstance().getChoiceBox().setValue(enemies[selectedX][selectedY].getMovementPattern());
-            System.out.println(enemies[selectedX][selectedY].getMovementPattern());
-        }
-        else {
-            LevelEditorView.getInstance().getChoiceBox().setValue("");
-        }
-    }*/
-    
+    /**
+     * Method that sets an {@code EnemyItem} to the array
+     * and applies a default movement pattern.
+     * @param x Arrays X value
+     * @param y Arrays Y value
+     * @param sprite the Sprite for the {@code EnemyItem}
+     */       
     public void setEnemy(int x, int y, Sprite sprite) {
         enemies[x][y] = new EnemyItem(true, sprite);
         enemies[x][y].setMovementPattern("LEFT");
     }
     
+    /**
+     * @return gets the Sprite from an {@code EnemyItem}
+     * @param source inputs the Source string
+     */       
     public Sprite getSprite(String source) {
         Sprite rSprite = Sprite.BLUE1;
         switch(source) {
@@ -247,39 +342,43 @@ public class LevelEditorLogic {
                 rSprite = Sprite.UFOYELLOW;
                 break;                  
         }    
-        
         return rSprite;
     }
     
+    /**
+     * @return gets the X value of the currently selected grid cell
+     */       
     public int getSelectedX() {
         return this.selectedX;
     }
     
+    /**
+     * @return gets the Y value of the currently selected grid cell
+     */       
     public int getSelectedY() {
         return this.selectedY;
     }
     
+    /**
+     * @param movement sets the movement pattern for an {@code EnemyItem}
+     * @param x Arrays X value
+     * @param y Arrays Y value
+     */       
     public void setMovementPattern(int x, int y, String movement) {
         enemies[x][y].setMovementPattern(movement);
-    }
+    }   
     
-    public void testSetEnemies(GraphicsContext gc) {
-        // Clearer enemyarray og legger til 2 testenemies
-        for (int i = 0; i < enemies.length; i++) {
-            for (int j = 0; j < 7; j++) {
-                enemies[i][j] = new EnemyItem(false);
-            }
-        }
-        enemies[1][1] = new EnemyItem(true, Sprite.BLUE1);
-        enemies[6][3] = new EnemyItem(true, Sprite.RED1);
-        enemies[7][6] = new EnemyItem(true, Sprite.UFORED);
-        drawGrid(gc);
-    }    
-    
+    /**
+     * @return gets the array of {@code EnemyItem}
+     */       
     public EnemyItem[][] getEnemies() {
         return this.enemies;
     }
     
+    /**
+     * Method that formats the Array into valid {@code LevelData} used by the {@code LevelLoader} class in the main project
+     * @return creates a string of code that can be input in the {@code LevelData} class to make a playable level.
+     */       
     public String formatArray() {
         String levelData = "private static final String[][][] LEVELNAME = new String[][][] {\n";
         for (int i = 0; i < 7; i++) {
@@ -318,18 +417,9 @@ public class LevelEditorLogic {
         return levelData;
     }
     
-    
-    
-    private static final String[][][] LEVEL2 = new String[][][]{
-            {{"0"}, {"0"}, {"0"}},
-            {{"2", "MADNESS_01"}, {"0"}},
-            {{"0"}, {"0"}, {"0"}},
-            {{"2", "MADNESS_01"}, {"0"}, {"0"}},
-            {{"0"}, {"0"}, {"0"}},
-            {{"0"}, {"3", "BOSS01", "BOSS_EIGHT"}, {"0"}},
-            {{"0"}, {"0"}, {"0"}}
-    };     
-    
+    /**
+     * Method that sets the LevelData to the ClipBoard
+     */       
     public void setDataToClipBoard() {
         final Clipboard clipboard = Clipboard.getSystemClipboard();
         final ClipboardContent content = new ClipboardContent();
@@ -337,6 +427,10 @@ public class LevelEditorLogic {
         clipboard.setContent(content);
     }
     
+    /**
+     * Clears the currently selected cell on the grid
+     * @param gc Passes GraphicsContext to draw on.
+     */       
     public void clearCell(GraphicsContext gc) {
         if (selectedX != -1 && selectedY != -1) {
             if (enemies[selectedX][selectedY].getActive()) {
