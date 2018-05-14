@@ -9,6 +9,8 @@ import javafx.scene.input.MouseEvent;
 
 /**
  * <h1>Handles the BackEnd functionality of the LevelEditor</h1>
+ * <i>Note:</i> The passing of the GraphicsContext could have been handled more elegantly,
+ * but I had an issue with accessing and was unable to sort it out due to time constraints.
  * 
  * @author Roger Birkenes Solli
  */
@@ -203,6 +205,7 @@ public class LevelEditorLogic {
                             // System.out.println("clicked cell " + i + " , " + j);
                             selectedX = i;
                             selectedY = j;
+                            reDrawCell(gc);
                             selectCell(gc, rectX, rectY);
                         }
                     }
@@ -248,23 +251,12 @@ public class LevelEditorLogic {
     }    
     
     /**
-     * Method that highlights a cell that has been clicked on the grid,
-     * and re-draws the previously selected cell.
+     * Method that highlights a cell that has been clicked on the grid
      * @param gc Passes GraphicsContext to draw on.
      * @param x The cells X value
      * @param y The cells Y value
      */
     public void selectCell(GraphicsContext gc, double x, double y) {
-        if (oldRectX != -1 && oldRectY != -1) {
-            gc.clearRect(oldRectX+1, oldRectY+1, cellSize-2, cellSize-2);
-            gc.setFill(Color.BLACK);
-            gc.fillRect(oldRectX+1, oldRectY+1, cellSize-2, cellSize-2);
-        }
-        if (oldSelectedX != -1 && oldSelectedY != -1) {
-            if (enemies[oldSelectedX][oldSelectedY].getActive()) {
-                gc.drawImage(new Image(enemies[oldSelectedX][oldSelectedY].getSprite().getSrc()), oldSelectedX*cellSize+(oldSelectedX), oldSelectedY*cellSize+(oldSelectedY), cellSize, cellSize);
-            }
-        }
         oldRectX = x;
         oldRectY = y;
         oldSelectedX = selectedX;
@@ -275,6 +267,23 @@ public class LevelEditorLogic {
         if (enemies[selectedX][selectedY].getActive()) {
             gc.drawImage(new Image(enemies[selectedX][selectedY].getSprite().src), selectedX*cellSize+(selectedX), selectedY*cellSize+(selectedY), cellSize, cellSize);
         }
+    }
+    
+    /**
+     * Re-Draws the previously selected cell
+     * @param gc Passes GraphicsContext to be drawn on.
+     */    
+    public void reDrawCell(GraphicsContext gc) {
+        if (oldRectX != -1 && oldRectY != -1) {
+            gc.clearRect(oldRectX+1, oldRectY+1, cellSize-2, cellSize-2);
+            gc.setFill(Color.BLACK);
+            gc.fillRect(oldRectX+1, oldRectY+1, cellSize-2, cellSize-2);
+        }
+        if (oldSelectedX != -1 && oldSelectedY != -1) {
+            if (enemies[oldSelectedX][oldSelectedY].getActive()) {
+                gc.drawImage(new Image(enemies[oldSelectedX][oldSelectedY].getSprite().getSrc()), oldSelectedX*cellSize+(oldSelectedX), oldSelectedY*cellSize+(oldSelectedY), cellSize, cellSize);
+            }
+        }        
     }
     
     /**

@@ -49,7 +49,7 @@ public class LevelEditorView {
     /**
      * Root pane
      */      
-    public Pane root;
+    public Pane root = new Pane();
     
     /**
      * BackGround image source path
@@ -77,20 +77,10 @@ public class LevelEditorView {
     final GraphicsContext gc = canvas.getGraphicsContext2D();
     
     /**
-     * Pane container for the canvas
-     */      
-    final Pane canvasPane = new Pane();
-    
-    /**
      * {@code LevelEditorLogic} object
      * @see LevelEditorLogic
      */      
     LevelEditorLogic logic = new LevelEditorLogic(columnCounter);  
-    
-    /**
-     * Slider for setting number of columns
-     */      
-    private Slider enemyWavesSlider;
     
     /**
      * FlowPane for draggable EnmyItem ImgViews
@@ -116,23 +106,102 @@ public class LevelEditorView {
      * @return gets the Root pane to pass to {@code Main}
      */      
     public Parent initScene(){
-        root = new Pane();
-        Text selectEnemiesText = new Text("Drag and Drop enemies to grid");
-        selectEnemiesText.setX(450);
-        selectEnemiesText.setY(230);
-        selectEnemiesText.setFill(Color.WHITE);
-        selectEnemiesText.setFont(selectEnemiesText.getFont().font(20));
         root.setPrefSize(1200, 800);
-        root.setBackground(getBackGroundImage(BG_IMG));
+        root.setBackground(getBackGroundImage(BG_IMG));        
         
         enemyPane = getEnemiesPane();
         populateEnemies();
         
+        final Pane canvasPane = new Pane();
         canvasPane.setTranslateX(10);
         canvasPane.setTranslateY(290);
         canvasPane.getChildren().add(canvas);
+        
         gc.setFill(Color.WHITE);
         gc.fillRect(1, 1, 1190, 425);
+        
+        initCanvas();        
+        Slider enemyWavesSlider = getEnemyWavesSlider();
+        setFooter();
+        setText();
+
+        root.getChildren().addAll(enemyPane, enemyWavesSlider, canvasPane);
+        logic.resetArray(gc);
+        
+        return root;
+    }
+    
+    /**
+     * Sets descriptive text in the scene
+     */      
+    private void setText() {
+        Text selectEnemiesText = new Text("Drag and Drop enemies to grid");
+        selectEnemiesText.setX(450);
+        selectEnemiesText.setY(230);
+        selectEnemiesText.setFill(Color.WHITE);
+        selectEnemiesText.setFont(selectEnemiesText.getFont().font(20));        
+        
+        Text selectWavesText = new Text("Set number of columns: (WARNING: Clears grid)");
+        selectWavesText.setX(20);
+        selectWavesText.setY(240);
+        selectWavesText.setFill(Color.WHITE);
+        selectWavesText.setFont(selectEnemiesText.getFont().font(15));  
+
+        root.getChildren().addAll(selectEnemiesText, selectWavesText);
+    }
+    
+    /**
+     * Sets a footer and attaches buttons and the ChoiceBox with EnemyMovement patterns
+     */      
+    private void setFooter() {
+        HBox footer = new HBox();
+        footer.setTranslateX(10);
+        footer.setTranslateY(740);
+        
+        MenuButton saveButton = new MenuButton("Save Level");
+        MenuButton resetButton = new MenuButton("Reset");
+        MenuButton clearButton = new MenuButton("Clear Cell");
+        Button helpButton = new Button("Help");
+        Text enemyMovementText = new Text("MovementType:");
+        enemyMovementText.setFill(Color.WHITE);
+        
+        helpButton.setTranslateX(750);
+        helpButton.setTranslateY(210);
+        helpButton.setOnMouseClicked(event -> getHelp());
+        footer.getChildren().addAll(saveButton, resetButton, clearButton, enemyMovementText, enemyMovement);
+        footer.setSpacing(10);
+        saveButton.setOnMouseClicked(event -> printData());
+        clearButton.setOnMouseClicked(event -> logic.clearCell(gc));
+        resetButton.setOnMouseClicked(event -> logic.resetArray(gc));  
+        enemyMovement.setOnAction(event -> {
+            setMovementPattern();
+                });       
+                
+        root.getChildren().addAll(helpButton, footer);
+    }
+    
+    /**
+     * Creates a slider to adjust number of columns (enemy waves)
+     */      
+    private Slider getEnemyWavesSlider() {
+    Slider enemyWavesSlider = new Slider(10, 30, columnCounter);
+        enemyWavesSlider.setShowTickMarks(true);
+        enemyWavesSlider.setBlockIncrement(1);
+        enemyWavesSlider.setTranslateX(20);
+        enemyWavesSlider.setTranslateY(250);
+        enemyWavesSlider.valueProperty().addListener((observable, oldValue, newValue) -> {
+            enemyWavesSlider.setValue(newValue.intValue());
+            columnCounter = newValue.intValue();
+            logic.setEnemyColumns(gc, columnCounter);
+        });  
+        return enemyWavesSlider;
+    }
+    
+    /**
+     * Initiates the Canvas where the grid is drawn
+     * and sets up the events for clicking and drag-and-drop functionality
+     */      
+    private void initCanvas() {
         canvas.setOnMouseClicked(event -> {
             logic.clicked(event, gc);
             if(logic.getEnemies()[logic.getSelectedX()][logic.getSelectedY()].getActive()) {
@@ -159,7 +228,6 @@ public class LevelEditorView {
             event.consume();
         });   
         
-        
         canvas.setOnDragOver((DragEvent event) -> {
             if (event.getGestureSource() != canvas &&
                     event.getDragboard().hasString()) {
@@ -167,57 +235,7 @@ public class LevelEditorView {
             }
             event.consume();
         });      
-        
-        Text selectWavesText = new Text("Set number of columns: (WARNING: Clears grid)");
-        selectWavesText.setX(20);
-        selectWavesText.setY(240);
-        selectWavesText.setFill(Color.WHITE);
-        selectWavesText.setFont(selectEnemiesText.getFont().font(15));  
-        
-        enemyWavesSlider = new Slider(10, 30, columnCounter);
-        enemyWavesSlider.setShowTickMarks(true);
-        enemyWavesSlider.setBlockIncrement(1);
-        enemyWavesSlider.setTranslateX(20);
-        enemyWavesSlider.setTranslateY(250);
-        enemyWavesSlider.valueProperty().addListener((observable, oldValue, newValue) -> {
-            enemyWavesSlider.setValue(newValue.intValue());
-            columnCounter = newValue.intValue();
-            logic.setEnemyColumns(gc, columnCounter);
-        });        
-        
-        HBox footer = new HBox();
-        footer.setTranslateX(10);
-        footer.setTranslateY(740);
-        
-        MenuButton saveButton = new MenuButton("Save Level");
-        MenuButton resetButton = new MenuButton("Reset");
-        MenuButton clearButton = new MenuButton("Clear Cell");
-        Button helpButton = new Button("Help");
-        Text enemyMovementText = new Text("MovementType:");
-        enemyMovementText.setFill(Color.WHITE);
-        
-        helpButton.setTranslateX(750);
-        helpButton.setTranslateY(210);
-        helpButton.setOnMouseClicked(event -> getHelp());
-        //enemyMovementText.setTranslateX(650);
-        //enemyMovement.setTranslateX(700);
-        footer.getChildren().addAll(saveButton, resetButton, clearButton, enemyMovementText, enemyMovement);
-        footer.setSpacing(10);
-        saveButton.setOnMouseClicked(event -> printData());
-        clearButton.setOnMouseClicked(event -> logic.clearCell(gc));
-        resetButton.setOnMouseClicked(event -> logic.resetArray(gc));  
-        enemyMovement.setOnAction(event -> {
-            setMovementPattern();
-                });       
-        
-        root.getChildren().addAll(selectEnemiesText, enemyPane, enemyWavesSlider, selectWavesText, canvasPane, helpButton, footer);
-        System.out.println(gc);
-        
-        logic.resetArray(gc);
-        
-        return root;
-
-    }    
+    }
     
     /**
      * @return gets the FlowPane that contains the draggable ImgViews
