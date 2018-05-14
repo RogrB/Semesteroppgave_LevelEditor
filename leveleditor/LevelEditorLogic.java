@@ -265,7 +265,8 @@ public class LevelEditorLogic {
         gc.setFill(Color.RED);
         gc.fillRect(x+1, y+1, cellSize-2, cellSize-2);
         if (enemies[selectedX][selectedY].getActive()) {
-            gc.drawImage(new Image(enemies[selectedX][selectedY].getSprite().src), selectedX*cellSize+(selectedX), selectedY*cellSize+(selectedY), cellSize, cellSize);
+            gc.drawImage(new Image(enemies[selectedX][selectedY].getSprite().src),
+                    selectedX*cellSize+(selectedX),selectedY*cellSize+(selectedY), cellSize, cellSize);
         }
     }
     
@@ -281,7 +282,8 @@ public class LevelEditorLogic {
         }
         if (oldSelectedX != -1 && oldSelectedY != -1) {
             if (enemies[oldSelectedX][oldSelectedY].getActive()) {
-                gc.drawImage(new Image(enemies[oldSelectedX][oldSelectedY].getSprite().getSrc()), oldSelectedX*cellSize+(oldSelectedX), oldSelectedY*cellSize+(oldSelectedY), cellSize, cellSize);
+                gc.drawImage(new Image(enemies[oldSelectedX][oldSelectedY].getSprite().getSrc()),
+                        oldSelectedX*cellSize+(oldSelectedX), oldSelectedY*cellSize+(oldSelectedY), cellSize, cellSize);
             }
         }        
     }
@@ -400,7 +402,8 @@ public class LevelEditorLogic {
                         levelData += "{\"" + enemies[j][i].getType() + "\", \"" + enemies[j][i].getMovementPattern() + "\"}";
                     }
                     else {
-                        levelData += "{\"" + enemies[j][i].getType() + "\", \"" + enemies[j][i].getSprite().toString() + "\", \"" + enemies[j][i].getMovementPattern() + "\"}";
+                        levelData += "{\"" + enemies[j][i].getType() + "\", \"" + enemies[j][i].getSprite().toString() +
+                                "\", \"" + enemies[j][i].getMovementPattern() + "\"}";
                     }
                     if (j != columns-1) {
                         levelData += ", ";

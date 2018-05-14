@@ -206,7 +206,6 @@ public class LevelEditorView {
             logic.clicked(event, gc);
             if(logic.getEnemies()[logic.getSelectedX()][logic.getSelectedY()].getActive()) {
                 enemyMovement.setValue(logic.getEnemies()[logic.getSelectedX()][logic.getSelectedY()].getMovementPattern());
-                //System.out.println(enemies[selectedX][selectedY].getMovementPattern());
             }
             else {
                 enemyMovement.setValue("");
@@ -218,7 +217,6 @@ public class LevelEditorView {
             boolean complete = false;
             if (db.hasString()) {
                 String nodeId = db.getString();
-                // System.out.println("dropped " + nodeId + " at " + logic.getCellX(event.getX()) + " , " + logic.getCellY(event.getY()));
                 logic.setEnemy(logic.getCellX(event.getX()), logic.getCellY(event.getY()), logic.getSprite(nodeId));
                 complete = true;
                 logic.drawGrid(gc);
@@ -303,7 +301,6 @@ public class LevelEditorView {
     public void setMovementPattern() {
         String pattern = enemyMovement.getValue();
         if (logic.getSelectedX() != -1 && logic.getSelectedY() != -1) {
-            //System.out.println("Selected movementpattern " + pattern  + " for enemy " + logic.getSelectedX() + " , " + logic.getSelectedY());
             logic.setMovementPattern(logic.getSelectedX(), logic.getSelectedY(), pattern);
         }
     }
